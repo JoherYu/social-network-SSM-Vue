@@ -1,5 +1,5 @@
 # 基于SSM框架下的前后端分离的单体Web项目
-本项目为第二次改写项目[分相](https://github.com/JoherYu/flask_web_program_social_network)，在项目  的基础上将后端语言替换为Java。
+本项目为第二次改写项目[分相](https://github.com/JoherYu/flask_web_program_social_network)，在项目[Vue-Flask-Website](https://github.com/JoherYu/Vue-Flask-Website)的基础上将后端语言替换为Java。
 后端采用SSM框架，前端继续使用VUE进行开发，并采用以前端接口为主的RESTful风格的API进行前后端数据交互，同时修复一些前端布局问题。
 ### 本项目从Flask迁移的各种功能替换方案如下：  
 *    **虚拟数据的生成**    
