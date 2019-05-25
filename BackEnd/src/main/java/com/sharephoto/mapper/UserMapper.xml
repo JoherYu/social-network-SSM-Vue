@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.UserMapper">
+    <resultMap id="BaseResultMap" type="com.sharephoto.entity.User">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password_hash" jdbcType="VARCHAR" property="passwordHash"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="website" jdbcType="VARCHAR" property="website"/>
+        <result column="bio" jdbcType="VARCHAR" property="bio"/>
+        <result column="location" jdbcType="VARCHAR" property="location"/>
+        <result column="member_since" jdbcType="TIMESTAMP" property="memberSince"/>
+        <result column="avatar_s" jdbcType="VARCHAR" property="avatarS"/>
+        <result column="avatar_m" jdbcType="VARCHAR" property="avatarM"/>
+        <result column="avatar_l" jdbcType="VARCHAR" property="avatarL"/>
+        <result column="avatar_raw" jdbcType="VARCHAR" property="avatarRaw"/>
+        <result column="confirmed" jdbcType="TINYINT" property="confirmed"/>
+        <result column="locked" jdbcType="TINYINT" property="locked"/>
+        <result column="active" jdbcType="TINYINT" property="active"/>
+        <result column="public_collections" jdbcType="TINYINT" property="publicCollections"/>
+        <result column="receive_comment_notification" jdbcType="TINYINT" property="receiveCommentNotification"/>
+        <result column="receive_follow_notification" jdbcType="TINYINT" property="receiveFollowNotification"/>
+        <result column="receive_collect_notification" jdbcType="TINYINT" property="receiveCollectNotification"/>
+        <result column="role_id" jdbcType="TINYINT" property="roleId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, email, username, password_hash, name, website, bio, location, member_since, avatar_s, 
+    avatar_m, avatar_l, avatar_raw, confirmed, locked, active, public_collections, receive_comment_notification, 
+    receive_follow_notification, receive_collect_notification, role_id
+    </sql>
+    <insert id="insertUser" parameterType="com.sharephoto.entity.User">
+    insert into user (username, ori_username, email, name, password_hash) values (#{username,jdbcType=VARCHAR}, #{oriUsername,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{passwordHash,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertFake">
+    insert into user (username, ori_username, email, name, password_hash, confirmed, bio, location, website) values (#{username}, #{oriUsername}, #{email}, #{name}, #{passwordHash}, #{confirmed}, #{bio}, #{location}, #{website})
+    </insert>
+    <update id="updateAdminInfoByUserId" parameterType="com.sharephoto.entity.User">
+        update user
+        <set>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="passwordHash != null">
+                password_hash = #{passwordHash,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="website != null">
+                website = #{website,jdbcType=VARCHAR},
+            </if>
+            <if test="bio != null">
+                bio = #{bio,jdbcType=VARCHAR},
+            </if>
+            <if test="location != null">
+                location = #{location,jdbcType=VARCHAR},
+            </if>
+            <if test="memberSince != null">
+                member_since = #{memberSince,jdbcType=TIMESTAMP},
+            </if>
+            <if test="avatarS != null">
+                avatar_s = #{avatarS,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarM != null">
+                avatar_m = #{avatarM,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarL != null">
+                avatar_l = #{avatarL,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarRaw != null">
+                avatar_raw = #{avatarRaw,jdbcType=VARCHAR},
+            </if>
+            <if test="confirmed != null">
+                confirmed = #{confirmed,jdbcType=TINYINT},
+            </if>
+            <if test="locked != null">
+                locked = #{locked,jdbcType=TINYINT},
+            </if>
+            <if test="active != null">
+                active = #{active,jdbcType=TINYINT},
+            </if>
+            <if test="publicCollections != null">
+                public_collections = #{publicCollections,jdbcType=TINYINT},
+            </if>
+            <if test="receiveCommentNotification != null">
+                receive_comment_notification = #{receiveCommentNotification,jdbcType=TINYINT},
+            </if>
+            <if test="receiveFollowNotification != null">
+                receive_follow_notification = #{receiveFollowNotification,jdbcType=TINYINT},
+            </if>
+            <if test="receiveCollectNotification != null">
+                receive_collect_notification = #{receiveCollectNotification,jdbcType=TINYINT},
+            </if>
+            <if test="roleId != null">
+                role_id = #{roleId,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <!--  锁定用户  -->
+    <update id="updateByUserIdToLock" parameterType="java.lang.Integer">
+    update user set locked = true,role_id = 1  where id = #{UserId,jdbcType=INTEGER}
+    </update>
+    <!--  解锁用户  -->
+    <update id="updateByUserIdToUnlock" parameterType="java.lang.Integer">
+        update user set locked = false,role_id = 1  where id = #{UserId,jdbcType=INTEGER}
+    </update>
+    <!-- 封禁用户 -->
+    <update id="updateByUserIdToBlock" parameterType="java.lang.Integer">
+        update user set active = false  where id = #{UserId,jdbcType=INTEGER}
+    </update>
+    <!-- 解封用户 -->
+    <update id="updateByUserIdToUnblock" parameterType="java.lang.Integer">
+        update user set active = true  where id = #{UserId,jdbcType=INTEGER}
+    </update>
+    <!--  上传头像  -->
+    <update id="updateAvatar">
+        update user set avatar_raw = #{avatarRaw} where id = #{id}
+    </update>
+    <!--  剪裁头像  -->
+    <update id="updateCropAvatar">
+        update user set avatar_s = #{avatarS}, avatar_m = #{avatarM}, avatar_l = #{avatarL} where id = #{id}
+    </update>
+    <!--  用户确认  -->
+    <update id="updateConfirmById">
+        update user set confirmed = 1 where id = #{id}
+    </update>
+    <!--  更新用户简介  -->
+    <update id="updateProfileSetting">
+        update user
+        set username = #{username}, name = #{name}, bio = #{bio}, website = #{website}, location = #{location} where id = #{id}
+    </update>
+    <!--  更新用户消息设置  -->
+    <update id="updateNotificationSetting">
+        update user
+        set receive_comment_notification = #{receiveCommentNotification}, receive_follow_notification = #{receiveFollowNotification}, receive_collect_notification = #{receiveCollectNotification} where username = #{username}
+    </update>
+    <!--  更新隐私设置  -->
+    <update id="updatePrivacySetting">
+        update user set public_collections = #{publicCollections} where username = #{username}
+    </update>
+    <update id="updatePassword">
+        update user set password_hash = #{password} where username = #{username}
+    </update>
+    <update id="updateEmail">
+        update user set email = #{email} where id = #{id}
+    </update>
+    <update id="updateAvatarRaw">
+        update user set avatar_raw = #{avatarRaw} where id = #{id}
+    </update>
+    <!--  删除用户  -->
+    <delete id="deleteUserByUsername">
+        delete from user where username = #{username};
+    </delete>
+    <!--  <update id="updateAdminInfo" parameterType="com.sharephoto.entity.User">-->
+    <!--    -->
+    <!--  </update>-->
+    <!--  查询用户总数-->
+    <select id="selectAllCount" resultType="java.lang.Integer">
+          select count(*) count from user
+    </select>
+    <select id="selectLockedCount" resultType="java.lang.Integer">
+          select count(*) count from user where locked = true
+    </select>
+    <select id="selectBlockedCount" resultType="java.lang.Integer">
+          select count(*) count from user where active = false
+    </select>
+    <!-- 查询用户信息 -->
+    <resultMap id="manageUserResultMap" type="User">
+        <id column="id" property="id"/>
+        <result column="avatar_s" property="avatarS"/>
+        <result column="name" property="name"/>
+        <result column="username" property="username"/>
+        <result column="role_id" property="roleId"/>
+        <result column="bio" property="bio"/>
+        <result column="location" property="location"/>
+        <result column="member_since" property="memberSince"/>
+        <result column="locked" property="locked"/>
+        <result column="active" property="active"/>
+        <result column="email" property="email"/>
+        <association property="photoCount" select="com.sharephoto.dao.UserMapper.selectCountByUserId" column="id"
+                     javaType="int"/>
+    </resultMap>
+    <select id="selectAll" resultMap="manageUserResultMap">
+    select user.id id, avatar_s, user.name name, username, role_id, bio, location, member_since, locked, active, email
+    from user left join role on role_id = role.id
+    order by member_since desc
+    </select>
+    <select id="selectAllLocked" resultMap="manageUserResultMap">
+    select user.id id, avatar_s, user.name name, username, role_id, bio, location, member_since, locked, active, email
+    from user left join role on role_id = role.id
+    where locked = true
+    order by member_since desc
+    </select>
+    <select id="selectAllBlocked" resultMap="manageUserResultMap">
+    select user.id id, avatar_s, user.name name, username, role_id, bio, location, member_since, locked, active, email
+    from user left join role on role_id = role.id
+    where active = false
+    order by member_since desc
+    </select>
+    <select id="selectAllAdministrator" resultMap="manageUserResultMap">
+    select user.id id, avatar_s, user.name name, username, role_id, bio, location, member_since, locked, active, email
+    from user left join role on role_id = role.id
+    where role.name = 'administrator'
+    order by member_since desc
+    </select>
+    <select id="selectAllModerator" resultMap="manageUserResultMap">
+    select user.id id, avatar_s, user.name name, username, role_id, bio, location, member_since, locked, active, email
+    from user left join role on role_id = role.id
+    where role.name = 'moderator'
+    order by member_since desc
+    </select>
+    <!-- 某用户上传图片数 -->
+    <select id="selectCountByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select count(*)
+    from photo left join user on photo.author_id = user.id
+    where user.id = #{userId,jdbcType=INTEGER}
+    </select>
+    <!-- （管理员）获取用户信息 -->
+    <resultMap id="selectAdminInfoResultMap" type="com.sharephoto.entity.User">
+        <id column="bio" property="bio"/>
+        <result column="website" property="website"/>
+        <result column="location" property="location"/>
+        <result column="username" property="username"/>
+        <result column="email" property="email"/>
+        <result column="name" property="name"/>
+        <result column="confirmed" property="confirmed"/>
+        <result column="active" property="active"/>
+        <result column="role_id" property="roleId"/>
+    </resultMap>
+    <select id="selectAdminInfoByUserId" resultMap="selectAdminInfoResultMap">
+    select role_id, bio, website, confirmed, active, location, username, email, name from user where id = #{userId,jdbcType=INTEGER}
+    </select>
+    <!-- 获取用户登录验证信息 -->
+    <resultMap id="loginInfoResultMap" type="com.sharephoto.entity.User">
+        <id column="email" property="email"/>
+        <result column="password_hash" jdbcType="VARCHAR" property="passwordHash"/>
+        <result column="active" jdbcType="TINYINT" property="active"/>
+    </resultMap>
+    <select id="selectLoginVerificationByUsername" resultMap="loginInfoResultMap" parameterType="java.lang.String">
+    select
+    username, password_hash, active
+    from user
+    where username = #{username,jdbcType=VARCHAR}
+    </select>
+    <!-- 根据用户邮箱地址获取用户用户名 -->
+    <select id="selectUsernameByEmail" resultType="java.lang.String" parameterType="java.lang.String">
+    select username from user where email = #{email,jdbcType=VARCHAR}
+    </select>
+    <!-- 根据用户邮箱地址获取用户Id -->
+    <select id="selectUserIdByUsername" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select id from user where username = #{username,jdbcType=VARCHAR}
+    </select>
+    <!-- 获取用户登录返回信息 -->
+    <resultMap id="selectLoginUserInfoByIdResultMap" type="com.sharephoto.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="name" property="name"/>
+        <result column="avatar_s" property="avatarS"/>
+        <result column="avatar_m" property="avatarM"/>
+        <association property="admin" select="com.sharephoto.dao.UserMapper.selectIsAdmin" column="id"
+                     javaType="boolean"/>
+        <association property="canModerate" select="com.sharephoto.dao.UserMapper.selectCanModerate" column="id"
+                     javaType="boolean"/>
+        <association property="canComment" select="com.sharephoto.dao.UserMapper.selectCanComment" column="id"
+                     javaType="boolean"/>
+        <association property="notificationCount" select="com.sharephoto.dao.UserMapper.selectNotificationById"
+                     column="id" javaType="java.lang.Integer"/>
+    </resultMap>
+    <select id="selectLoginUserInfoByEmail" resultMap="selectLoginUserInfoByIdResultMap"
+            parameterType="java.lang.String">
+    select id, username, name, avatar_s, avatar_m from user where email = #{email,jdbcType=VARCHAR}
+    </select>
+    <select id="selectNotificationById" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*) from notification where receiver_id = #{userId,jdbcType=INTEGER} and is_read = 0
+    </select>
+    <select id="selectIsAdmin" resultType="boolean" parameterType="java.lang.Integer">
+    select * from user where id = #{userId,jdbcType=INTEGER} and role_id = 4
+    </select>
+    <select id="selectCanModerate" resultType="boolean" parameterType="java.lang.Integer">
+    select * from roles_permissions left join user on user.role_id = roles_permissions.role_id where user.id = #{userId,jdbcType=INTEGER} and permission_id = 5
+    </select>
+    <select id="selectCanComment" resultType="boolean" parameterType="java.lang.Integer">
+    select * from roles_permissions left join user on user.role_id = roles_permissions.role_id where user.id = #{userId,jdbcType=INTEGER} and permission_id = 3
+    </select>
+    <!-- 搜索用户 -->
+    <resultMap id="selectUserMap" type="com.sharephoto.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="avatar_m" property="avatarM"/>
+        <result column="name" property="name"/>
+        <association property="followed" select="com.sharephoto.dao.UserMapper.selectUserIsFollowBy"
+                     column="{id=id, currentUserId=currentUserId}" javaType="boolean"/>
+        <association property="following" select="com.sharephoto.dao.UserMapper.selectUserIsFollowing"
+                     column="{id=id, currentUserId=currentUserId}" javaType="boolean"/>
+    </resultMap>
+    <select id="selectUserByKey" resultMap="selectUserMap">
+    select
+     id, username, avatar_m, name,
+     case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+     from user where name
+     like concat(concat("%",#{q,jdbcType=VARCHAR}),"%") or username like concat(concat("%",#{q,jdbcType=VARCHAR}),"%")
+    </select>
+    <!-- 当前用户是否关注此用户 -->
+    <select id="selectUserIsFollowBy" resultType="boolean">
+    select count(*) from follow where followed_id = #{id,jdbcType=INTEGER} and follower_id = #{currentUserId,jdbcType=INTEGER}
+    </select>
+    <!-- 当前用户是否被此用户关注 -->
+    <select id="selectUserIsFollowing" resultType="boolean">
+    select count(*) from follow where followed_id = #{currentUserId,jdbcType=INTEGER} and follower_id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--  根据用户名查询用户角色  -->
+    <select id="selectRoleByUsername" resultType="java.lang.String">
+    select role.name from role left join user on role_id = role.id where user.username = #{username,jdbcType=VARCHAR}
+    </select>
+    <select id="selectPermissions" resultType="java.lang.String">
+    select permission.name from (permission left join roles_permissions on permission.id = permission_id) left join role on role_id = role.id where role.name = #{roleName,jdbcType=VARCHAR}
+    </select>
+    <!--  当前用户是否已激活  -->
+    <select id="selectConfirmed" resultType="java.lang.Boolean" parameterType="java.lang.Integer">
+    select confirmed from user where id = #{currentUserId,jdbcType=INTEGER}
+    </select>
+    <!--  获取用户资料弹窗信息  -->
+    <resultMap id="selectPopupDataResultMap" type="com.sharephoto.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="name" property="name"/>
+        <result column="avatar_m" property="avatarM"/>
+        <association property="followed" select="com.sharephoto.dao.UserMapper.selectUserIsFollowBy"
+                     column="{id=id, currentUserId=currentUserId}" javaType="boolean"/>
+        <association property="following" select="com.sharephoto.dao.UserMapper.selectUserIsFollowing"
+                     column="{id=id, currentUserId=currentUserId}" javaType="boolean"/>
+        <association property="followerCount" select="com.sharephoto.dao.FollowMapper.selectFollowerCount"
+                     column="id" javaType="integer"/>
+        <association property="photoCount" select="com.sharephoto.dao.UserMapper.selectCountByUserId" column="id"
+                     javaType="int"/>
+    </resultMap>
+    <select id="selectPopupData" resultMap="selectPopupDataResultMap" parameterType="java.lang.Integer">
+    select id, username, avatar_m, name,
+    case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+    from user where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--  查询用户是否接受关注通知  -->
+    <select id="selectFollowNotificationSettings" resultType="boolean" parameterType="integer">
+    select receive_follow_notification from user where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserById" resultMap="selectUserMap">
+    select
+    id, username, avatar_m, name,
+    case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+    from user where id = #{author_id,jdbcType=INTEGER}
+    </select>
+    <!--  根据Id获取用户昵称  -->
+    <select id="selectNameById" resultType="java.lang.String" parameterType="java.lang.Integer">
+    select name from user where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--  获取评论区弹窗信息  -->
+    <select id="selectPopupDataByComment" resultMap="selectPopupDataResultMap">
+    select id, username, avatar_m, name,
+    case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+    from user where id = #{author_id,jdbcType=INTEGER}
+    </select>
+    <!--  获取评论接收设置  -->
+    <select id="selectCommentNotificationSettings" resultType="java.lang.Boolean">
+        select receive_comment_notification from user where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--  获取图片收藏者信息  -->
+    <select id="selectUserByPhotoId" resultMap="selectUserMap">
+        select id, username, avatar_m, name,
+        case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+        from user left join collect on collector_id = id
+        where collected_id = #{photoId}
+        order by timestamp
+    </select>
+    <!--  获取原始尺寸头像  -->
+    <select id="selectRaw" resultType="java.lang.String">
+        select avatar_raw from user where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--  根据id获取邮箱地址  -->
+    <select id="selectEmailById" resultType="java.lang.String">
+    select email from user where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--  根据用户名获取用户详细信息  -->
+    <resultMap id="selectByUserusernameResultMap" type="com.sharephoto.entity.User">
+        <id property="id" column="id"/>
+        <result property="avatarL" column="avatar_l"/>
+        <result property="name" column="name"/>
+        <result property="username" column="username"/>
+        <result property="bio" column="bio"/>
+        <result property="website" column="website"/>
+        <result property="location" column="location"/>
+        <result property="memberSince" column="member_since"/>
+        <result property="locked" column="locked"/>
+        <result property="active" column="active"/>
+        <result property="email" column="email"/>
+        <result property="publicCollections" column="public_collections"/>
+        <association property="followed" select="com.sharephoto.dao.UserMapper.selectUserIsFollowBy"
+                     column="{id=id, currentUserId=currentUserId}" javaType="boolean"/>
+        <association property="following" select="com.sharephoto.dao.UserMapper.selectUserIsFollowing"
+                     column="{id=id, currentUserId=currentUserId}" javaType="boolean"/>
+        <association property="followerCount" select="com.sharephoto.dao.FollowMapper.selectFollowerCount"
+                     column="id" javaType="integer"/>
+        <association property="followingCount" select="com.sharephoto.dao.FollowMapper.selectFollowingCount"
+                     column="id" javaType="integer"/>
+        <association property="photoCount" select="com.sharephoto.dao.UserMapper.selectCountByUserId" column="id"
+                     javaType="int"/>
+        <association property="collectionCount" select="com.sharephoto.dao.CollectMapper.selectCollectCountByUserId"
+                     column="id" javaType="int"/>
+    </resultMap>
+    <select id="selectByUserusername" resultMap="selectByUserusernameResultMap">
+        select id, avatar_l, name, username, bio, website, location, member_since, locked, active, email, public_collections,
+        case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+        from user
+        where username = #{username}
+    </select>
+    <!--  获取用户所有粉丝  -->
+    <select id="selectFollowers" resultMap="selectUserMap">
+        select b.id id, b.username username, b.avatar_m avatar_m, b.name name,
+        case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+        from (user a left join follow on a.id = followed_id) left join user b on b.id = follower_id
+        where a.id = #{id}
+    </select>
+    <!--  获取用户所有关注  -->
+    <select id="selectFollowing" resultMap="selectUserMap">
+        select a.id id, a.username username, a.avatar_m avatar_m, a.name name,
+        case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+        from (user a left join follow on a.id = followed_id) left join user b on b.id = follower_id
+        where b.id = #{id}
+    </select>
+    <!--  查询用户是否被封禁  -->
+    <select id="selectActive" resultType="java.lang.Boolean">
+        select active from user where username = #{username}
+    </select>
+    <!--  查询用户是否被锁定  -->
+    <select id="selectLocked" resultType="java.lang.Boolean">
+         select locked from user where username = #{username}
+    </select>
+    <!--  查询用户简介  -->
+    <select id="selectProfileSetting" resultType="com.sharephoto.entity.User">
+        select username, name, bio, website, location from user where username = #{username}
+    </select>
+    <!--  查询消息设置  -->
+    <select id="selectNotificationSetting" resultType="com.sharephoto.entity.User">
+        select receive_comment_notification, receive_follow_notification, receive_collect_notification from user where username = #{username}
+    </select>
+    <!--  查询隐私设置  -->
+    <select id="selectPrivacySetting" resultType="java.lang.Boolean">
+        select public_collections from user where username = #{username}
+    </select>
+    <!--  查询用户密码  -->
+    <select id="selectPassword" resultType="java.lang.String">
+        select password_hash from user where username = #{username}
+    </select>
+    <!--  查询邮箱时候已经注册过  -->
+    <select id="selectEmail" resultType="java.lang.Boolean">
+        select count(*) from user where email = #{email}
+    </select>
+    <select id="selectOriUsernaem" resultType="java.lang.String">
+        select ori_username from user  where username = #{username}
+    </select>
+    <select id="selectAvatars" resultType="com.sharephoto.entity.User">
+        select avatar_raw, avatar_s, avatar_m, avatar_l from user where id = #{id}
+    </select>
+</mapper>

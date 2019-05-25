@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.CommentMapper">
+    <resultMap id="BaseResultMap" type="com.sharephoto.entity.Comment">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp"/>
+        <result column="flag" jdbcType="SMALLINT" property="flag"/>
+        <result column="replied_id" jdbcType="INTEGER" property="repliedId"/>
+        <result column="author_id" jdbcType="INTEGER" property="authorId"/>
+        <result column="photo_id" jdbcType="INTEGER" property="photoId"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.sharephoto.entity.Comment">
+        <result column="body" jdbcType="LONGVARCHAR" property="body"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, timestamp, flag, replied_id, author_id, photo_id
+     </sql>
+    <sql id="Blob_Column_List">
+    body
+    </sql>
+    <update id="updateFlag">
+    update comment set flag = flag + 1 where id = #{id}
+    </update>
+    <!-- 查询相片总数 -->
+    <select id="selectAllCount" resultType="java.lang.Integer">
+    select count(*) count from comment
+    </select>
+
+    <!-- 查询被举报相片总数 -->
+    <select id="selectReportedCount" resultType="java.lang.Integer">
+    select count(*) count from comment where flag > 0
+    </select>
+    <!--  查询所有评论并按时间降序排列-->
+    <resultMap id="selectAllResultMap" type="Comment">
+        <id column="id" property="id"/>
+        <result column="body" property="body"/>
+        <result column="name" property="authorName"/>
+        <result column="username" property="authorUsername"/>
+        <result column="photo_id" property="authorId"/>
+        <result column="flag" property="flag"/>
+        <result column="timestamp" property="timestamp"/>
+    </resultMap>
+    <select id="selectAll" resultMap="selectAllResultMap">
+    select comment.id id, body, user.name name, user.username username, photo.id photo_id, comment.flag flag, comment.timestamp timestamp
+    from (comment left join user on author_id = user.id) left join photo on photo.id = photo_id
+    order by comment.timestamp desc
+    </select>
+    <!-- 查询所有评论并按被举报数排列 -->
+    <select id="selectAllByFlag" resultMap="selectAllResultMap">
+    select comment.id id, body, user.name name, user.username username, photo.id photo_id, comment.flag flag, comment.timestamp timestamp
+    from (comment left join user on author_id = user.id) left join photo on photo.id = photo_id
+    order by comment.flag desc
+    </select>
+    <!--  查询图片的所有评论  -->
+    <resultMap id="selectCommentByPhotoIdResultMap" type="com.sharephoto.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="timestamp" property="timestamp"/>
+        <result column="body" property="body"/>
+        <result column="replied_id" property="repliedId"/>
+        <association property="author" select="com.sharephoto.dao.UserMapper.selectPopupDataByComment"
+                     column="{author_id=author_id, currentUserId=currentUserId}" javaType="com.sharephoto.entity.User"/>
+    </resultMap>
+    <select id="selectCommentByPhotoId" resultMap="selectCommentByPhotoIdResultMap">
+    select replied_id, author_id, timestamp, id, body,
+    case when (#{currentUserId,jdbcType=INTEGER} != "") then #{currentUserId,jdbcType=INTEGER} end as currentUserId
+    from comment where photo_id = #{id,jdbcType=INTEGER}
+    </select>
+      <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultType="com.sharephoto.entity.Comment">
+        select author_id, photo_id
+        from comment
+        where id = #{id,jdbcType=INTEGER}
+      </select>
+    <select id="selectAuthorIdById" resultType="java.lang.Integer">
+        select author_id from comment where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from comment
+        where id = #{id,jdbcType=INTEGER}
+      </delete>
+    <!--      <insert id="insertWithReply" parameterType="com.sharephoto.entity.Comment">-->
+    <!--        insert into comment (replied_id, author_id, photo_id, body)-->
+    <!--        values (#{repliedId,jdbcType=INTEGER}, #{authorId,jdbcType=INTEGER}, #{photoId,jdbcType=INTEGER},-->
+    <!--          #{body,jdbcType=LONGVARCHAR})-->
+    <!--      </insert>-->
+    <!--    <insert id="insert">-->
+    <!--        insert into comment (author_id, photo_id, body)-->
+    <!--        values (#{authorId,jdbcType=INTEGER}, #{photoId,jdbcType=INTEGER},-->
+    <!--          #{body,jdbcType=LONGVARCHAR})-->
+    <!--    </insert>-->
+    <insert id="insertSelective" parameterType="com.sharephoto.entity.Comment">
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="repliedId != 0">
+                replied_id,
+            </if>
+            <if test="authorId != null">
+                author_id,
+            </if>
+            <if test="photoId != null">
+                photo_id,
+            </if>
+            <if test="body != null">
+                body,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="repliedId != 0">
+                #{repliedId,jdbcType=INTEGER},
+            </if>
+            <if test="authorId != null">
+                #{authorId,jdbcType=INTEGER},
+            </if>
+            <if test="photoId != null">
+                #{photoId,jdbcType=INTEGER},
+            </if>
+            <if test="body != null">
+                #{body,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <!--  <update id="updateByPrimaryKeySelective" parameterType="com.sharephoto.entity.Comment">-->
+    <!--    update comment-->
+    <!--    <set>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        timestamp = #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      </if>-->
+    <!--      <if test="flag != null">-->
+    <!--        flag = #{flag,jdbcType=SMALLINT},-->
+    <!--      </if>-->
+    <!--      <if test="repliedId != null">-->
+    <!--        replied_id = #{repliedId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="authorId != null">-->
+    <!--        author_id = #{authorId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="photoId != null">-->
+    <!--        photo_id = #{photoId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="body != null">-->
+    <!--        body = #{body,jdbcType=LONGVARCHAR},-->
+    <!--      </if>-->
+    <!--    </set>-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </update>-->
+    <!--  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.sharephoto.entity.Comment">-->
+    <!--    update comment-->
+    <!--    set timestamp = #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      flag = #{flag,jdbcType=SMALLINT},-->
+    <!--      replied_id = #{repliedId,jdbcType=INTEGER},-->
+    <!--      author_id = #{authorId,jdbcType=INTEGER},-->
+    <!--      photo_id = #{photoId,jdbcType=INTEGER},-->
+    <!--      body = #{body,jdbcType=LONGVARCHAR}-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </update>-->
+    <!--  <update id="updateByPrimaryKey" parameterType="com.sharephoto.entity.Comment">-->
+    <!--    update comment-->
+    <!--    set timestamp = #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      flag = #{flag,jdbcType=SMALLINT},-->
+    <!--      replied_id = #{repliedId,jdbcType=INTEGER},-->
+    <!--      author_id = #{authorId,jdbcType=INTEGER},-->
+    <!--      photo_id = #{photoId,jdbcType=INTEGER}-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </update>-->
+</mapper>

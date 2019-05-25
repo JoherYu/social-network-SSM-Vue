@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.CollectMapper">
+    <resultMap id="BaseResultMap" type="com.sharephoto.entity.Collect">
+        <id column="collector_id" jdbcType="INTEGER" property="collectorId"/>
+        <id column="collected_id" jdbcType="INTEGER" property="collectedId"/>
+        <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    collector_id, collected_id, timestamp
+    </sql>
+    <delete id="delete">
+    delete from collect where collector_id = #{currentUserId,jdbcType=INTEGER} and collected_id = #{photoId,jdbcType=INTEGER}
+    </delete>
+    <select id="selectcollected" resultType="java.lang.Boolean">
+    select count(*) from collect where collector_id = #{currentUserId,jdbcType=INTEGER} and collected_id = #{photoId,jdbcType=INTEGER}
+    </select>
+    <select id="selectCollectCountByUserId" resultType="java.lang.Integer">
+        select count(*) from collect where collector_id = #{userId}
+    </select>
+    <!--  <select id="selectByPrimaryKey" parameterType="com.sharephoto.entity.CollectKey" resultMap="BaseResultMap">-->
+    <!--    select -->
+    <!--    <include refid="Base_Column_List" />-->
+    <!--    from collect-->
+    <!--    where collector_id = #{collectorId,jdbcType=INTEGER}-->
+    <!--      and collected_id = #{collectedId,jdbcType=INTEGER}-->
+    <!--  </select>-->
+    <!--  <delete id="deleteByPrimaryKey" parameterType="com.sharephoto.entity.CollectKey">-->
+    <!--    delete from collect-->
+    <!--    where collector_id = #{collectorId,jdbcType=INTEGER}-->
+    <!--      and collected_id = #{collectedId,jdbcType=INTEGER}-->
+    <!--  </delete>-->
+      <insert id="insert" parameterType="com.sharephoto.entity.Collect">
+        insert into collect (collector_id, collected_id)
+        values (#{currentUserId,jdbcType=INTEGER}, #{photoId,jdbcType=INTEGER} )
+      </insert>
+    <!--  <insert id="insertSelective" parameterType="com.sharephoto.entity.Collect">-->
+    <!--    insert into collect-->
+    <!--    <trim prefix="(" suffix=")" suffixOverrides=",">-->
+    <!--      <if test="collectorId != null">-->
+    <!--        collector_id,-->
+    <!--      </if>-->
+    <!--      <if test="collectedId != null">-->
+    <!--        collected_id,-->
+    <!--      </if>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        timestamp,-->
+    <!--      </if>-->
+    <!--    </trim>-->
+    <!--    <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+    <!--      <if test="collectorId != null">-->
+    <!--        #{collectorId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="collectedId != null">-->
+    <!--        #{collectedId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      </if>-->
+    <!--    </trim>-->
+    <!--  </insert>-->
+    <!--  <update id="updateByPrimaryKeySelective" parameterType="com.sharephoto.entity.Collect">-->
+    <!--    update collect-->
+    <!--    <set>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        timestamp = #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      </if>-->
+    <!--    </set>-->
+    <!--    where collector_id = #{collectorId,jdbcType=INTEGER}-->
+    <!--      and collected_id = #{collectedId,jdbcType=INTEGER}-->
+    <!--  </update>-->
+    <!--  <update id="updateByPrimaryKey" parameterType="com.sharephoto.entity.Collect">-->
+    <!--    update collect-->
+    <!--    set timestamp = #{timestamp,jdbcType=TIMESTAMP}-->
+    <!--    where collector_id = #{collectorId,jdbcType=INTEGER}-->
+    <!--      and collected_id = #{collectedId,jdbcType=INTEGER}-->
+    <!--  </update>-->
+</mapper>

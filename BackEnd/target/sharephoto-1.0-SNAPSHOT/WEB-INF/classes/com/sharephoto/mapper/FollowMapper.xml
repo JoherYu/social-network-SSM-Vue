@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.FollowMapper">
+    <resultMap id="BaseResultMap" type="com.sharephoto.entity.Follow">
+        <id column="follower_id" jdbcType="INTEGER" property="followerId"/>
+        <id column="followed_id" jdbcType="INTEGER" property="followedId"/>
+        <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    follower_id, followed_id, timestamp
+    </sql>
+    <!--  <select id="selectByPrimaryKey" parameterType="com.sharephoto.entity.FollowKey" resultMap="BaseResultMap">-->
+    <!--    select -->
+    <!--    <include refid="Base_Column_List" />-->
+    <!--    from follow-->
+    <!--    where follower_id = #{followerId,jdbcType=INTEGER}-->
+    <!--      and followed_id = #{followedId,jdbcType=INTEGER}-->
+    <!--  </select>-->
+    <select id="selectFollowerCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*) from follow where followed_id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectFollowingCount" resultType="java.lang.Integer">
+    select count(*) from follow where follower_id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="delete">
+    delete from follow
+    where follower_id = #{currentUserId,jdbcType=INTEGER}
+      and followed_id = #{userId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert">
+    insert into follow (follower_id, followed_id)
+    values (#{currentUserId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER})
+    </insert>
+    <!--  <insert id="insertSelective" parameterType="com.sharephoto.entity.Follow">-->
+    <!--    insert into follow-->
+    <!--    <trim prefix="(" suffix=")" suffixOverrides=",">-->
+    <!--      <if test="followerId != null">-->
+    <!--        follower_id,-->
+    <!--      </if>-->
+    <!--      <if test="followedId != null">-->
+    <!--        followed_id,-->
+    <!--      </if>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        timestamp,-->
+    <!--      </if>-->
+    <!--    </trim>-->
+    <!--    <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+    <!--      <if test="followerId != null">-->
+    <!--        #{followerId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="followedId != null">-->
+    <!--        #{followedId,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      </if>-->
+    <!--    </trim>-->
+    <!--  </insert>-->
+    <!--  <update id="updateByPrimaryKeySelective" parameterType="com.sharephoto.entity.Follow">-->
+    <!--    update follow-->
+    <!--    <set>-->
+    <!--      <if test="timestamp != null">-->
+    <!--        timestamp = #{timestamp,jdbcType=TIMESTAMP},-->
+    <!--      </if>-->
+    <!--    </set>-->
+    <!--    where follower_id = #{followerId,jdbcType=INTEGER}-->
+    <!--      and followed_id = #{followedId,jdbcType=INTEGER}-->
+    <!--  </update>-->
+    <!--  <update id="updateByPrimaryKey" parameterType="com.sharephoto.entity.Follow">-->
+    <!--    update follow-->
+    <!--    set timestamp = #{timestamp,jdbcType=TIMESTAMP}-->
+    <!--    where follower_id = #{followerId,jdbcType=INTEGER}-->
+    <!--      and followed_id = #{followedId,jdbcType=INTEGER}-->
+    <!--  </update>-->
+</mapper>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.TagMapper">
+    <resultMap id="BaseResultMap" type="com.sharephoto.entity.Tag">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name
+  </sql>
+
+    <!--  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">-->
+    <!--    select -->
+    <!--    <include refid="Base_Column_List" />-->
+    <!--    from tag-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </select>-->
+    <!--  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">-->
+    <!--    delete from tag-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </delete>-->
+      <insert id="insert">
+        insert into tag (name)
+        values (#{name,jdbcType=VARCHAR})
+      </insert>
+    <insert id="insertFake">
+        insert into tag (id, name)
+        values (#{id}, #{name})
+    </insert>
+    <!--  <insert id="insertSelective" parameterType="com.sharephoto.entity.Tag">-->
+    <!--    insert into tag-->
+    <!--    <trim prefix="(" suffix=")" suffixOverrides=",">-->
+    <!--      <if test="id != null">-->
+    <!--        id,-->
+    <!--      </if>-->
+    <!--      <if test="name != null">-->
+    <!--        name,-->
+    <!--      </if>-->
+    <!--    </trim>-->
+    <!--    <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+    <!--      <if test="id != null">-->
+    <!--        #{id,jdbcType=INTEGER},-->
+    <!--      </if>-->
+    <!--      <if test="name != null">-->
+    <!--        #{name,jdbcType=VARCHAR},-->
+    <!--      </if>-->
+    <!--    </trim>-->
+    <!--  </insert>-->
+    <!--  <update id="updateByPrimaryKeySelective" parameterType="com.sharephoto.entity.Tag">-->
+    <!--    update tag-->
+    <!--    <set>-->
+    <!--      <if test="name != null">-->
+    <!--        name = #{name,jdbcType=VARCHAR},-->
+    <!--      </if>-->
+    <!--    </set>-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </update>-->
+    <!--  <update id="updateByPrimaryKey" parameterType="com.sharephoto.entity.Tag">-->
+    <!--    update tag-->
+    <!--    set name = #{name,jdbcType=VARCHAR}-->
+    <!--    where id = #{id,jdbcType=INTEGER}-->
+    <!--  </update>-->
+
+    <!-- 根据标签ID删除标签 -->
+    <delete id="deleteTagById" parameterType="integer">
+      delete from tag where id = #{tagId,jdbcType=INTEGER}
+  </delete>
+
+    <!-- 查询标签总数 -->
+    <select id="selectAllCount" resultType="java.lang.Integer">
+    select count(*) count from tag
+  </select>
+
+    <!--  查询所有标签-->
+    <resultMap id="selsectTagCardMap" type="Tag">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <association property="photoCount" select="com.sharephoto.dao.TagMapper.selectCountByTagId" column="id"
+                     javaType="int"/>
+    </resultMap>
+    <select id="selectAll" resultMap="selsectTagCardMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tag
+        order by id desc
+    </select>
+
+    <!-- 某标签下图片数 -->
+    <select id="selectCountByTagId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select
+    count(*) count
+    from
+    (photo left join tagging on photo.id = tagging.photo_id) left join tag on tagging.tag_id = tag.id
+    where tag.id = #{tagId,jdbcType=INTEGER}
+  </select>
+    <!-- 搜索标签 -->
+    <select id="selectTagByKey" resultMap="selsectTagCardMap" parameterType="java.lang.String">
+    select id, name from tag where name like concat(concat("%",#{q,jdbcType=VARCHAR}),"%")
+    </select>
+    <!--  筛选热门标签  -->
+    <select id="selectHotTags" resultMap="selsectTagCardMap">
+    select id, name from tag left join tagging on tag.id = tag_id group by tag_id order by count(tag_id) desc limit 10
+    </select>
+    <!--  根据图片id获取标签  -->
+    <select id="selectTagByPhotoId" resultType="com.sharephoto.entity.Tag" parameterType="integer">
+    select id, name from tag left join tagging on id = tag_id where photo_id = #{photoId,jdbcType=INTEGER}
+    </select>
+    <select id="selectIdByName" resultType="java.lang.Integer">
+    select id from tag where name = #{name}
+    </select>
+    <select id="selectNameByid" resultType="java.lang.String">
+    select name from tag where id = #{id}
+    </select>
+</mapper>

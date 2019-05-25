@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.RolesRermissionsMapper">
+  <resultMap id="BaseResultMap" type="com.sharephoto.entity.RolesRermissions">
+    <result column="role_id" jdbcType="TINYINT" property="roleId" />
+    <result column="permission_id" jdbcType="TINYINT" property="permissionId" />
+  </resultMap>
+  <insert id="insert" parameterType="com.sharephoto.entity.RolesRermissions">
+    insert into roles_permissions (role_id, permission_id)
+    values (#{roleId,jdbcType=TINYINT}, #{permissionId,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sharephoto.entity.RolesRermissions">
+    insert into roles_permissions
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="permissionId != null">
+        permission_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        #{roleId,jdbcType=TINYINT},
+      </if>
+      <if test="permissionId != null">
+        #{permissionId,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+</mapper>

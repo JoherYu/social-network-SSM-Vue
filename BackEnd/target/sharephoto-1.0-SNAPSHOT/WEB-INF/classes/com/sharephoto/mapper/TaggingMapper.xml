@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sharephoto.dao.TaggingMapper">
+  <resultMap id="BaseResultMap" type="com.sharephoto.entity.Tagging">
+    <result column="photo_id" jdbcType="INTEGER" property="photoId" />
+    <result column="tag_id" jdbcType="INTEGER" property="tagId" />
+  </resultMap>
+  <insert id="insert" parameterType="com.sharephoto.entity.Tagging">
+    insert into tagging (photo_id, tag_id)
+    values (#{photoId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER})
+  </insert>
+  <delete id="delete">
+    delete from tagging where photo_id = #{photoId,jdbcType=INTEGER} and tag_id = #{tagId,jdbcType=INTEGER}
+  </delete>
+  <select id="selectRecord" resultType="java.lang.Boolean">
+    select count(*) from tagging where photo_id = #{photoId} and tag_id = #{tagId}
+  </select>
+  <select id="selectTaggingIsEmpty" resultType="java.lang.Boolean">
+    select count(*) from tagging where tag_id = #{tagId}
+  </select>
+  <!--  <insert id="insertSelective" parameterType="com.sharephoto.entity.Tagging">-->
+<!--    insert into tagging-->
+<!--    <trim prefix="(" suffix=")" suffixOverrides=",">-->
+<!--      <if test="photoId != null">-->
+<!--        photo_id,-->
+<!--      </if>-->
+<!--      <if test="tagId != null">-->
+<!--        tag_id,-->
+<!--      </if>-->
+<!--    </trim>-->
+<!--    <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+<!--      <if test="photoId != null">-->
+<!--        #{photoId,jdbcType=INTEGER},-->
+<!--      </if>-->
+<!--      <if test="tagId != null">-->
+<!--        #{tagId,jdbcType=INTEGER},-->
+<!--      </if>-->
+<!--    </trim>-->
+<!--  </insert>-->
+</mapper>
