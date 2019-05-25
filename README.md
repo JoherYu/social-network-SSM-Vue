@@ -12,7 +12,7 @@
      注册时，自我关注记录使用触发器（share_photo.sql:150）生成，默认头像调用[GenerateAvatar](https://github.com/JoherYu/social-network-SSM-Vue/blob/master/BackEnd/src/main/java/com/sharephoto/utils/GenerateAvatar.java)生成。
 *    **文件冗余处理**    
 
-     图片直接调用原生IO删除，头像通过session传递需要删除的图像信息（UserServiceImpl.java:88-180-191）,代替SQLalchemy的数据库监听功能。
+     图片直接调用原生IO删除，头像通过session传递需要删除的图像信息（UserServiceImpl.java:88-180-191）再进行删除,以代替SQLalchemy的数据库监听功能。
 *    **安全管理**    
 
      使用Shiro框架进行登录及角色权限认证管理，使用SpringMVC拦截器结合注解进行[用户激活状态认证](https://github.com/JoherYu/social-network-SSM-Vue/blob/master/BackEnd/src/main/java/com/sharephoto/utils/confirmAnnotationInterceptor.java)和[CSRF认证](https://github.com/JoherYu/social-network-SSM-Vue/blob/master/BackEnd/src/main/java/com/sharephoto/utils/CSRFAnnotationInterceptor.java)。
