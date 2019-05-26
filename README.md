@@ -16,7 +16,8 @@
 *    **安全管理**    
 
      使用Shiro框架进行登录及角色权限认证管理，使用SpringMVC拦截器结合注解进行[用户激活状态认证](https://github.com/JoherYu/social-network-SSM-Vue/blob/master/BackEnd/src/main/java/com/sharephoto/utils/confirmAnnotationInterceptor.java)和[CSRF认证](https://github.com/JoherYu/social-network-SSM-Vue/blob/master/BackEnd/src/main/java/com/sharephoto/utils/CSRFAnnotationInterceptor.java)。
-     使用JJWT和Java-Mail实现电子信箱激活、密码重置与邮箱更换功能。
+     使用JJWT和Java-Mail实现电子信箱激活、密码重置与邮箱更换功能。    
+     **(P.S:因在Shiro中使用用户名为帐户密码加盐比对，故为保证在用户名进行更改后能正常登录，在数据库user表中添加ori_username字段存储用户的初始用户名，并以此生成盐值。)**
 *    **其他**    
 
      分页功能使用PageHelpert替代，图片处理使用原始IO编写。
